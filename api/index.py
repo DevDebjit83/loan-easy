@@ -1,10 +1,13 @@
 import sys
-import os
+from pathlib import Path
 
-# Add parent directory to path to import app_auth
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+# Add parent directory to path so we can import app_auth
+parent_dir = str(Path(__file__).parent.parent)
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
 
+# Import the Flask app from app_auth
 from app_auth import app
 
-# Export for Vercel - this is what Vercel will call
-# No need to rename, just ensure it's imported
+# Vercel will call this app directly
+# No wrapper needed - just expose the Flask app
