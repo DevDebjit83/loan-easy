@@ -760,13 +760,6 @@ def make_prediction(features):
 
 # ============ INITIALIZE DATABASE ============
 
-def init_db():
-    with app.app_context():
-        db.create_all()
-        print("✓ Database initialized successfully")
-
-# ============ INITIALIZE DATABASE ============
-
 def init_app():
     """Initialize database if not exists"""
     try:
@@ -776,19 +769,6 @@ def init_app():
     except Exception as e:
         print(f"✗ Database initialization error: {e}")
         # Don't crash - let app start anyway
-
-# Initialize on first request (for Vercel serverless)
-@app.before_request
-def before_first_request():
-    """Initialize database on first request"""
-    if not hasattr(app, 'db_initialized'):
-        try:
-            init_app()
-            app.db_initialized = True
-        except Exception as e:
-            print(f"Error in before_first_request: {e}")
-            # Set flag anyway to prevent infinite loop
-            app.db_initialized = True
 
 # ============ RUN APPLICATION ============
 
