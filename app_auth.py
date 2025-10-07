@@ -715,12 +715,24 @@ def init_db():
 
 # ============ INITIALIZE DATABASE ============
 
-# Initialize database on startup (for local and deployment)
-init_db()
+def init_app():
+    """Initialize database if not exists"""
+    with app.app_context():
+        db.create_all()
+
+# Initialize on first request (for Vercel serverless)
+@app.before_request
+def before_first_request():
+    """Initialize database on first request"""
+    if not hasattr(app, 'db_initialized'):
+        init_app()
+        app.db_initialized = True
 
 # ============ RUN APPLICATION ============
 
 if __name__ == '__main__':
+    # Initialize database for local development
+    init_app()
     print("\n" + "="*60)
     print("🏦 LOAN EASY - Professional Banking Application")
     print("="*60)

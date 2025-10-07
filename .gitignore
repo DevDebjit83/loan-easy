@@ -56,3 +56,4 @@ real_data/
 # Temporary files
 *.tmp
 *.bak
+.vercel
