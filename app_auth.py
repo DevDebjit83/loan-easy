@@ -8,9 +8,19 @@ import numpy as np
 import os
 import json
 from functools import wraps
+from pathlib import Path
+
+# Get the base directory
+BASE_DIR = Path(__file__).resolve().parent
+
+# Import verification service
 from verification_service import VerificationService
 
-app = Flask(__name__)
+# Initialize Flask app with explicit paths
+app = Flask(__name__,
+            template_folder=str(BASE_DIR / 'templates'),
+            static_folder=str(BASE_DIR / 'static'))
+            
 app.config['SECRET_KEY'] = 'loaneasy-secret-key-2025-secure'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///loaneasy.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -22,15 +32,23 @@ login_manager.login_view = 'login'
 login_manager.login_message = 'Please log in to access this page.'
 login_manager.login_message_category = 'info'
 
-# Load ML Model
+# Load ML Model using absolute paths
 try:
-    model = joblib.load('loan_model_real.pkl')
-    label_encoders = joblib.load('label_encoders_real.pkl')
-    feature_names = joblib.load('feature_names_real.pkl')
+    model_path = BASE_DIR / 'loan_model_real.pkl'
+    encoders_path = BASE_DIR / 'label_encoders_real.pkl'
+    features_path = BASE_DIR / 'feature_names_real.pkl'
+    
+    model = joblib.load(str(model_path))
+    label_encoders = joblib.load(str(encoders_path))
+    feature_names = joblib.load(str(features_path))
     print("✓ ML Model loaded successfully")
+    print(f"  Model path: {model_path}")
 except Exception as e:
     print(f"✗ Error loading model: {e}")
+    print(f"  Looked in: {BASE_DIR}")
     model = None
+    label_encoders = None
+    feature_names = None
 
 # ============ DATABASE MODELS ============
 
