@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Training scripts (not needed for production)
+train_model.py
+train_model_real.py
+generate_data.py
+analyze_model.py
+create_visuals.py
+
+# Training data (not needed for production)
+loan_data.csv
+real_data/
+
+# Generated images (not needed for production)
+*.png
+data_patterns.png
+model_comparison.png
+model_logic_visual.png
+real_model_comparison.png
+
+# Database (will be created on deployment)
+instance/
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+
+# Documentation (optional - can include if you want)
+# COMPLETE_EXPLANATION.md
+# MODEL_EXPLANATION.md
+# QUICK_SUMMARY.md
+
+# Other app files not needed for main deployment
+app.py
+app_real.py
+app_with_auth.py
+
+# Model info text files (optional)
+model_info.txt
+model_info_real.txt
+
+# Git
+.git/
+.gitignore
