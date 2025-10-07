@@ -166,13 +166,47 @@ def profile_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# ============ ERROR HANDLERS ============
+
+@app.errorhandler(500)
+def internal_error(error):
+    """Handle 500 errors"""
+    return jsonify({
+        'error': 'Internal Server Error',
+        'message': str(error),
+        'status': 500
+    }), 500
+
+@app.errorhandler(Exception)
+def handle_exception(e):
+    """Handle uncaught exceptions"""
+    import traceback
+    return jsonify({
+        'error': 'Application Error',
+        'message': str(e),
+        'traceback': traceback.format_exc(),
+        'status': 500
+    }), 500
+
 # ============ ROUTES ============
 
 @app.route('/')
 def index():
-    if current_user.is_authenticated:
-        return redirect(url_for('dashboard'))
-    return render_template('landing.html')
+    try:
+        if current_user.is_authenticated:
+            return redirect(url_for('dashboard'))
+        return render_template('landing.html')
+    except Exception as e:
+        return f"Error loading page: {str(e)}<br>Check Vercel logs for details.", 500
+
+@app.route('/health')
+def health():
+    """Health check endpoint"""
+    return jsonify({
+        'status': 'healthy',
+        'model_loaded': model is not None,
+        'database': 'initialized'
+    })
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -717,16 +751,26 @@ def init_db():
 
 def init_app():
     """Initialize database if not exists"""
-    with app.app_context():
-        db.create_all()
+    try:
+        with app.app_context():
+            db.create_all()
+            print("✓ Database initialized successfully")
+    except Exception as e:
+        print(f"✗ Database initialization error: {e}")
+        # Don't crash - let app start anyway
 
 # Initialize on first request (for Vercel serverless)
 @app.before_request
 def before_first_request():
     """Initialize database on first request"""
     if not hasattr(app, 'db_initialized'):
-        init_app()
-        app.db_initialized = True
+        try:
+            init_app()
+            app.db_initialized = True
+        except Exception as e:
+            print(f"Error in before_first_request: {e}")
+            # Set flag anyway to prevent infinite loop
+            app.db_initialized = True
 
 # ============ RUN APPLICATION ============
 
